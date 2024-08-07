@@ -113,7 +113,7 @@ function installUnbound() {
 
 			# Configuration
 			echo 'interface: 10.8.0.1
-access-control: 10.8.0.1/24 allow
+access-control: 10.8.0.1/16 allow
 hide-identity: yes
 hide-version: yes
 use-caps-for-id: yes
@@ -124,7 +124,7 @@ prefetch: yes' >>/etc/unbound/unbound.conf
 
 			# Configuration
 			sed -i 's|# interface: 0.0.0.0$|interface: 10.8.0.1|' /etc/unbound/unbound.conf
-			sed -i 's|# access-control: 127.0.0.0/8 allow|access-control: 10.8.0.1/24 allow|' /etc/unbound/unbound.conf
+			sed -i 's|# access-control: 127.0.0.0/8 allow|access-control: 10.8.0.1/16 allow|' /etc/unbound/unbound.conf
 			sed -i 's|# hide-identity: no|hide-identity: yes|' /etc/unbound/unbound.conf
 			sed -i 's|# hide-version: no|hide-version: yes|' /etc/unbound/unbound.conf
 			sed -i 's|use-caps-for-id: no|use-caps-for-id: yes|' /etc/unbound/unbound.conf
@@ -134,7 +134,7 @@ prefetch: yes' >>/etc/unbound/unbound.conf
 
 			# Configuration
 			sed -i 's|# interface: 0.0.0.0$|interface: 10.8.0.1|' /etc/unbound/unbound.conf
-			sed -i 's|# access-control: 127.0.0.0/8 allow|access-control: 10.8.0.1/24 allow|' /etc/unbound/unbound.conf
+			sed -i 's|# access-control: 127.0.0.0/8 allow|access-control: 10.8.0.1/16 allow|' /etc/unbound/unbound.conf
 			sed -i 's|# hide-identity: no|hide-identity: yes|' /etc/unbound/unbound.conf
 			sed -i 's|# hide-version: no|hide-version: yes|' /etc/unbound/unbound.conf
 			sed -i 's|# use-caps-for-id: no|use-caps-for-id: yes|' /etc/unbound/unbound.conf
@@ -157,7 +157,7 @@ prefetch: yes' >>/etc/unbound/unbound.conf
 	trust-anchor-file: trusted-key.key
 	root-hints: root.hints
 	interface: 10.8.0.1
-	access-control: 10.8.0.1/24 allow
+	access-control: 10.8.0.1/16 allow
 	port: 53
 	num-threads: 2
 	use-caps-for-id: yes
@@ -739,7 +739,7 @@ function installOpenVPN() {
 		fi
 
 		./easyrsa --batch build-server-full "$SERVER_NAME" nopass
-		EASYRSA_CRL_DAYS=3650 ./easyrsa gen-crl
+		EASYRSA_CRL_DAYS=18250 ./easyrsa gen-crl
 
 		case $TLS_SIG in
 		1)
@@ -782,7 +782,7 @@ persist-key
 persist-tun
 keepalive 10 120
 topology subnet
-server 10.8.0.0 255.255.255.0
+server 10.8.0.0 255.255.0.0
 ifconfig-pool-persist ipp.txt" >>/etc/openvpn/server.conf
 
 	# DNS resolvers
@@ -964,7 +964,7 @@ verb 3" >>/etc/openvpn/server.conf
 
 	# Script to add rules
 	echo "#!/bin/sh
-iptables -t nat -I POSTROUTING 1 -s 10.8.0.0/24 -o $NIC -j MASQUERADE
+iptables -t nat -I POSTROUTING 1 -s 10.8.0.0/16 -o $NIC -j MASQUERADE
 iptables -I INPUT 1 -i tun0 -j ACCEPT
 iptables -I FORWARD 1 -i $NIC -o tun0 -j ACCEPT
 iptables -I FORWARD 1 -i tun0 -o $NIC -j ACCEPT
@@ -980,7 +980,7 @@ ip6tables -I INPUT 1 -i $NIC -p $PROTOCOL --dport $PORT -j ACCEPT" >>/etc/iptabl
 
 	# Script to remove rules
 	echo "#!/bin/sh
-iptables -t nat -D POSTROUTING -s 10.8.0.0/24 -o $NIC -j MASQUERADE
+iptables -t nat -D POSTROUTING -s 10.8.0.0/16 -o $NIC -j MASQUERADE
 iptables -D INPUT -i tun0 -j ACCEPT
 iptables -D FORWARD -i $NIC -o tun0 -j ACCEPT
 iptables -D FORWARD -i tun0 -o $NIC -j ACCEPT
