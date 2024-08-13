@@ -1148,6 +1148,7 @@ function newClient() {
 			;;
 		esac
 	} >>"$homeDir/$CLIENT.ovpn"
+	touch $homeDir/ccd/$CLIENT
 
 	echo ""
 	echo "The configuration file has been written to $homeDir/$CLIENT.ovpn."
